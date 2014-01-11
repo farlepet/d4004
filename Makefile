@@ -6,14 +6,16 @@ INSTALL    = /usr/bin/$(OUT)
 
 SRCS       = $(wildcard $(SRC)/*.d)
 
-DC         = gdc
+# This compiler is much slower, but I can cut the executable size much more using `strip`
+DC         = dmd
 
-DFLAGS     = -Wall -Werror -I$(SRC)
+DFLAGS     = -I$(SRC)
 
 
 link:   $(OBJS)
 	@echo -e "\033[33m  \033[1mCompiling d4004\033[0m"
-	@$(DC) $(DFLAGS) $(SRCS) -o $(OUT)
+	@$(DC) $(DFLAGS) $(SRCS) -of$(OUT)
+	@strip -s $(OUT)
 
 
 
