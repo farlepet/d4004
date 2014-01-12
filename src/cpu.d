@@ -94,6 +94,8 @@ class cpu_4004
 
 	int next_instr()
 	{
+		int instr_cyc = 1; // 1 for reading the opcode (1 byte)
+
 		ubyte instr = rom[pc++];
 
 		writefln("Executing instruction: %02X", instr);
@@ -104,6 +106,7 @@ class cpu_4004
 				break;
 
 			case 0x10: // JCN -- conditional jump
+				instr_cyc++; // 2-byte == 2 cycles
 				ubyte instr2 = rom[pc++]; // 2-byte instruction
 				ubyte cond = instr & 0x0F; // Condition
 				ubyte addr = instr2; // Address
@@ -122,6 +125,7 @@ class cpu_4004
 			case 0x20:
 				if(!(instr & 1)) // FIM -- fetch immediate
 				{
+					instr_cyc++; // 2-byte == 2 cycles
 					ubyte instr2 = rom[pc++]; // 2-byte instruction
 					ubyte reg = instr & 0x0E;
 					ubyte addr = instr2;
@@ -155,12 +159,14 @@ class cpu_4004
 				break;
 
 			case 0x40: // JUN -- jump unconditional
+				instr_cyc++; // 2-byte == 2 cycles
 				ubyte instr2 = rom[pc++]; // 2-byte instruction
 				ushort addr = (((instr & 0x0F) << 8) | instr2);
 				pc = addr;
 				break;
 
 			case 0x50: // JMS -- jump to subroutine
+				instr_cyc++; // 2-byte == 2 cycles
 				ubyte instr2 = rom[pc++]; // 2-byte instruction
 				ushort addr = (((instr & 0x0F) << 8) | instr2);
 				add_call_stack(addr);
@@ -172,6 +178,7 @@ class cpu_4004
 				break;
 
 			case 0x70: // ISZ -- increment register, and jump if non-zero
+				instr_cyc++; // 2-byte == 2 cycles
 				ubyte instr2 = rom[pc++]; // 2-byte instruction
 				ubyte reg = instr & 0x0F;
 				r[reg] = (r[reg] + 1) & 0x0F;
@@ -329,6 +336,6 @@ class cpu_4004
 				break;
 		}
 
-		return 0;
+		return instr_cyc;
 	}
 }
