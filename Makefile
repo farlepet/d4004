@@ -6,7 +6,6 @@ INSTALL    = /usr/bin/$(OUT)
 
 SRCS       = $(wildcard $(SRC)/*.d)
 
-# This compiler is much slower, but I can cut the executable size much more using `strip`
 DC         = dmd
 
 DFLAGS     = -I$(SRC)
@@ -23,6 +22,7 @@ clean:
 	@echo -e "\033[33m  \033[1mCleaning sources\033[0m"
 	@rm -f $(MAIN)
 	@rm -f $(OUT)
+	@rm -f $(OUT).o
 
 install:
 	@echo -e "\033[33m  \033[1mInstalling executable\033[0m"

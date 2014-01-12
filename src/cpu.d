@@ -1,6 +1,8 @@
 module cpu;
 
+import std.c.stdlib;
 import std.stdio;
+import std.file;
 
 /* Register information:
  *
@@ -94,6 +96,8 @@ class cpu_4004
 	{
 		ubyte instr = rom[pc++];
 
+		writefln("Executing instruction: %02X", instr);
+
 		switch(instr & 0xF0)
 		{
 			case 0x00: // NOP
@@ -152,13 +156,13 @@ class cpu_4004
 
 			case 0x40: // JUN -- jump unconditional
 				ubyte instr2 = rom[pc++]; // 2-byte instruction
-				ushort addr = ((instr << 8) | instr2);
+				ushort addr = (((instr & 0x0F) << 8) | instr2);
 				pc = addr;
 				break;
 
 			case 0x50: // JMS -- jump to subroutine
 				ubyte instr2 = rom[pc++]; // 2-byte instruction
-				ushort addr = ((instr << 8) | instr2);
+				ushort addr = (((instr & 0x0F) << 8) | instr2);
 				add_call_stack(addr);
 				break;
 
@@ -309,6 +313,10 @@ class cpu_4004
 					case 0xFD: // DCL: Designate command line
 						ram_cmdline = a & 0x07;
 						break;
+
+
+					case 0xFF: // Emulator-only opcode!
+						return -1;
 
 					default:
 						// Error handle here?
